@@ -40,7 +40,17 @@ jobs:
         id: date
         run: echo "::set-output name=date::$(date +'%d/%m/%Y')"
 
+      - name: 'check author validity'
+        id: 'validate_pr'
+        uses: mmagician/validate_pr@v1
+        with:
+          targetRepoOwner: "w3f"
+          targetRepo: "Open-Grants-Program"
+          prLink: "${{ steps.grant_parser.outputs.contract_url }}"
+          author: "${{ github.event.pull_request.author }}"
+
       - name: Get last row
+        if: "${{ steps.grant_parser.outputs.project_name }}" 
         id: get_last_row
         uses: mmagician/gsheet.action@v0.1.0
         with:
@@ -51,9 +61,8 @@ jobs:
           GSHEET_CLIENT_EMAIL: ${{ secrets.GSHEET_CLIENT_EMAIL }}
           GSHEET_PRIVATE_KEY: ${{ secrets.GSHEET_PRIVATE_KEY }}
 
-      # - name: 'check author validity'
-
       - name: 'write the data to a gsheet'
+        if: "${{ steps.grant_parser.outputs.project_name }}" 
         id: 'update_worksheet'
         uses: jroehl/gsheet.action@v1.0.0 # you can specify '@release' to always have the latest changes
         with:
