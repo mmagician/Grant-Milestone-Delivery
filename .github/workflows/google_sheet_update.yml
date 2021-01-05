@@ -22,19 +22,19 @@ jobs:
         uses: actions/checkout@master
         if: ${{ env.ACT }}
 
-      - name: 'local testing parse files'
-        if: ${{ env.ACT }}
-        id: grant_parser
-        uses: mmagician/read-file-action@v2
-        with:
-          path: 'deliveries/.delivery_testing.md'
-
-      # - name: 'parse files'
-      #   if: ${{ !env.ACT }}
+      # - name: 'local testing parse files'
+      #   if: ${{ env.ACT }}
       #   id: grant_parser
       #   uses: mmagician/read-file-action@v2
       #   with:
-      #     path: "${{ github.workspace }}/${{ steps.files.outputs.added }}"
+      #     path: 'deliveries/.delivery_testing.md'
+
+      - name: 'parse files'
+        if: ${{ !env.ACT }}
+        id: grant_parser
+        uses: mmagician/read-file-action@v2
+        with:
+          path: "${{ github.workspace }}/${{ steps.files.outputs.added }}"
 
       - name: Get current date
         id: date
@@ -42,7 +42,7 @@ jobs:
 
       - name: 'check author validity'
         id: 'validate_pr'
-        uses: mmagician/validate_pr@v1
+        uses: ./.github/actions/validate_pr
         with:
           targetRepoOwner: "w3f"
           targetRepo: "Open-Grants-Program"
