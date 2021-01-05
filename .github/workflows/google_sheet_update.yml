@@ -50,7 +50,7 @@ jobs:
           author: "${{ github.event.pull_request.author }}"
 
       - name: Get last row
-        if: "${{ steps.grant_parser.outputs.project_name }}" 
+        if: "${{ steps.validate_pr.outputs.isValid }}"
         id: get_last_row
         uses: mmagician/gsheet.action@v0.1.0
         with:
@@ -62,7 +62,7 @@ jobs:
           GSHEET_PRIVATE_KEY: ${{ secrets.GSHEET_PRIVATE_KEY }}
 
       - name: 'write the data to a gsheet'
-        if: "${{ steps.grant_parser.outputs.project_name }}" 
+        if: "${{ steps.validate_pr.outputs.isValid }}"
         id: 'update_worksheet'
         uses: jroehl/gsheet.action@v1.0.0 # you can specify '@release' to always have the latest changes
         with:
