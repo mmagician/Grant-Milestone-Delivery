@@ -49,18 +49,6 @@ jobs:
           prLink: "${{ steps.grant_parser.outputs.contract_url }}"
           author: "${{ github.event.pull_request.author }}"
 
-      - name: Get last row
-        if: "${{ steps.validate_pr.outputs.isValid }}"
-        id: get_last_row
-        uses: mmagician/gsheet.action@v0.1.0
-        with:
-          spreadsheetId: ${{ secrets.SPREADSHEET_ID }}
-          startRow: 283
-          worksheetTitle: "Evaluation"
-        env:
-          GSHEET_CLIENT_EMAIL: ${{ secrets.GSHEET_CLIENT_EMAIL }}
-          GSHEET_PRIVATE_KEY: ${{ secrets.GSHEET_PRIVATE_KEY }}
-
       - name: 'write the data to a gsheet'
         if: "${{ steps.validate_pr.outputs.isValid }}"
         id: 'update_worksheet'
@@ -70,22 +58,21 @@ jobs:
           commands: | # list of commands, specified as a valid JSON string
             [
               { 
-                "command": "updateData", 
+                "command": "appendData", 
                 "args": 
                 { 
                   "data": [[
-                    "=INDEX(Legal!$A$7:$A$400,MATCH(B${{ steps.get_last_row.outputs.lastRow }},Legal!$D$7:$D$400,0))", 
+                    "=INDEX(Legal!$A$7:$A$400,MATCH(INDIRECT(CONCATENATE(\"B\", TEXT(ROW(), \"#\"))),Legal!$D$7:$D$400,0))", 
                     "${{ steps.grant_parser.outputs.project_name }}", 
                     "${{ steps.grant_parser.outputs.milestone_number }}", 
                     "",
                     "Not Yet", 
-                    "${{ steps.grant_parser.outputs.contract_url }}", 
+                    "=INDEX(Legal!$W$7:$W$400,MATCH(INDIRECT(CONCATENATE(\"B\", TEXT(ROW(), \"#\"))),Legal!$D$7:$D$400,0))",
                     "", 
                     "${{ steps.date.outputs.date }}"
                   ]], 
                   "worksheetTitle": "Evaluation", 
                   "minCol": 1,
-                  "minRow": "${{ steps.get_last_row.outputs.lastRow }}",
                   "valueInputOption": "USER_ENTERED"
                 }
                }
